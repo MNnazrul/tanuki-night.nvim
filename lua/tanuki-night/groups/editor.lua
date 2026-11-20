@@ -33,7 +33,7 @@ return function(c, o)
 
     Visual = { bg = c.visual },
     VisualNOS = "Visual",
-    Search = { fg = c.fg, bg = util.blend(c.line_target, c.bg, 0.8) },
+    Search = { fg = c.fg, bg = c.search or util.blend(c.line_target, c.bg, 0.8) },
     IncSearch = { fg = c.bg, bg = c.orange },
     CurSearch = "IncSearch",
     Substitute = { fg = c.bg, bg = c.red },

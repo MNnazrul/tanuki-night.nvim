@@ -1,6 +1,8 @@
 local M = {}
 
 M.defaults = {
+  -- "night" or "day". Normally leave nil: `:colorscheme tanuki-night` / `tanuki-day` decide.
+  style = nil,
   -- Don't set a background on Normal / NormalNC / SignColumn etc.
   transparent = false,
   -- Set vim.g.terminal_color_* for :terminal.
@@ -16,9 +18,9 @@ M.defaults = {
   gitlab_cursorline = false,
   -- Dim inactive windows (uses bg_dark for NormalNC).
   dim_inactive = false,
-  -- fun(colors) -> nil : mutate the palette before highlights are built.
+  -- fun(colors, style) -> nil : mutate the palette before highlights are built.
   on_colors = nil,
-  -- fun(hl, colors) -> nil : mutate/extend the highlight table.
+  -- fun(hl, colors, style) -> nil : mutate/extend the highlight table.
   on_highlights = nil,
 }
 

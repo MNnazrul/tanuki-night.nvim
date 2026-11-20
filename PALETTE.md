@@ -94,3 +94,40 @@ desaturated because of macOS color management + JPEG).
 | Hunk header | `#353638` |
 | Dropdown / float bg | `#28272d`, hover `#3a373e` |
 | Focus accent (inputs) | `#5d87c3` |
+
+
+---
+
+# tanuki-day — GitLab "Light" syntax theme
+
+Source of truth: GitLab's `app/assets/stylesheets/highlight/_white_base.scss` (a port of
+pygments-github-style) plus `highlight/themes/white.scss` overrides; UI colors are GitLab
+Pajamas tokens. Checked against 40 light code screenshots in `images/light/` (MANIFEST there) with
+`scripts/compare_light.py` — 96.7% of 4794 tokens agree; the rest are measurement noise
+(bold black keywords next to colored names) and Vue `<script>` (GitLab colors it unlike a .js
+file; Neovim can't tell them apart).
+
+| Role | Value | GitLab var |
+|---|---|---|
+| bg / code color | `#ffffff` / `#3a383d` | neutral-0 / $white-code-color (neutral-800) |
+| keyword | code color, **bold** | .hljs-keyword |
+| comment | `#999988` italic | $white-c |
+| preproc / meta (#include, whole #define line, decorators in hljs) | `#999999` **bold** | $white-cp |
+| string | `#dd1144` | $white-s |
+| number | `#009999` | $white-m |
+| function / title | `#990000` **bold** | $white-nf |
+| type / class / built_in | `#445588` **bold** | $white-kt, $white-nc |
+| params / literals / this | `#0086b3` | $white-nb |
+| attr / property / variable / constant | `#008080` | $white-na, nv, no |
+| symbol | `#990073` | $white-ss |
+| regex | `#009926` | $white-sr |
+| section (markdown/make headings) | `#800080` **bold** | $white-gh |
+| tag | `#000080` (Vue template) | $white-nt |
+| diff added / word | `#ecfdf0` / `#c7f0d2` | $line-added(-dark) |
+| diff removed / word | `#fbe9eb` / `#fac5cd` | $line-removed(-dark) |
+| hunk header | `#ecebea` | neutral-50 |
+| #L line | `#e8f2fd` | blue-50 |
+| search match | `#fafe3d` | $white-highlight |
+
+Language rules that differ from the defaults live in `groups/languages_day.lua` and in
+`queries/*/highlights.scm` as `@tanuki.*` captures (only tanuki-day colors them).

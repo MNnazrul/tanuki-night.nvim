@@ -1,7 +1,7 @@
 <h1 align="center">🦝 tanuki-night</h1>
 
 <p align="center">
-  GitLab's dark syntax theme for Neovim and Vim — the Tomorrow Night palette with GitLab's own token rules.
+  GitLab's syntax themes for Neovim and Vim — <b>tanuki-night</b> (GitLab Dark) and <b>tanuki-day</b> (GitLab Light), with GitLab's own token rules.
 </p>
 
 <p align="center">
@@ -11,19 +11,29 @@
 </p>
 
 ![tanuki-night](assets/hero.png)
+![tanuki-day](assets/day-hero.png)
 
 If you read a lot of code in GitLab merge requests, your editor can look the same.
-tanuki-night was matched **token by token** against GitLab screenshots: which words are
-purple, which are yellow, which stay plain — per language, not just the palette.
+Both styles were matched **token by token** against GitLab screenshots: which words are
+colored, which are bold, which stay plain — per language, not just the palette.
+
+| Style | Command | Based on |
+|---|---|---|
+| 🌙 **tanuki-night** | `:colorscheme tanuki-night` | GitLab "Dark" syntax theme (Tomorrow Night palette) |
+| ☀️ **tanuki-day** | `:colorscheme tanuki-day` | GitLab "Light" syntax theme (exact values from GitLab's `_white_base.scss`) |
+
+`:set background=light` / `dark` switches between them.
 
 ## ✨ Features
 
-- GitLab dark token rules for **C, C++, Rust, Zig, Python, Lua, Go, JavaScript/TypeScript, Ruby, Bash, CSS/SCSS, YAML, TOML, JSON, Makefile, HTML**
+- Two styles: **night** (GitLab Dark) and **day** (GitLab Light)
+- GitLab token rules for **C, C++, Rust, Zig, Python, Lua, Go, JavaScript/TypeScript, Vue, Ruby, Bash, CSS/SCSS, YAML, TOML, JSON, Makefile, HTML, Markdown**
+- tanuki-day checked automatically against 40 GitLab light code screenshots (96.7% of tokens match; `scripts/compare_light.py`)
 - Any other language still gets the full Tomorrow Night look through generic Treesitter and Vim syntax groups
-- GitLab UI details: purple current line number, merge request diff colors, orange search/line target
+- GitLab UI details: purple current line number, merge request diff colors, search and #L line colors
 - LSP semantic tokens are tamed so Treesitter keeps the GitLab look
 - Plugin support (see [below](#-plugin-support))
-- Works in **Vim** too (generated `colors/tanuki-night.vim`)
+- Works in **Vim** too (generated `colors/tanuki-night.vim`, `colors/tanuki-day.vim`)
 - Extras for **NvChad**, **lualine**, **kitty**, **Ghostty**, **Alacritty**, **WezTerm**
 
 ## ⚡️ Requirements
@@ -42,7 +52,7 @@ purple, which are yellow, which stay plain — per language, not just the palett
   lazy = false,
   priority = 1000,
   config = function()
-    vim.cmd.colorscheme("tanuki-night")
+    vim.cmd.colorscheme("tanuki-night") -- or "tanuki-day"
   end,
 }
 ```
@@ -75,7 +85,9 @@ git clone https://github.com/MNnazrul/tanuki-night.nvim ~/.vim/pack/themes/start
 ## 🚀 Usage
 
 ```vim
-colorscheme tanuki-night
+colorscheme tanuki-night   " dark
+colorscheme tanuki-day     " light
+set background=light       " switches tanuki-night -> tanuki-day (and back with =dark)
 ```
 
 ```lua
@@ -98,8 +110,8 @@ require("tanuki-night").setup({
     functions = {},
     strings = {},
   },
-  on_colors = function(colors) end,
-  on_highlights = function(hl, colors) end,
+  on_colors = function(colors, style) end,        -- style: "night" | "day"
+  on_highlights = function(hl, colors, style) end,
 })
 ```
 
@@ -120,12 +132,23 @@ require("tanuki-night").setup({
 Use the palette in your own config:
 
 ```lua
-local c = require("tanuki-night").colors()
+local night = require("tanuki-night").colors("night")
+local day = require("tanuki-night").colors("day")
 ```
 
 Full docs: `:help tanuki-night`.
 
 ## 🎨 Palette
+
+### tanuki-day (GitLab Light)
+
+| | | | |
+|---|---|---|---|
+| ![](https://placehold.co/16x16/ffffff/ffffff.png) `bg` `#ffffff` | ![](https://placehold.co/16x16/3a383d/3a383d.png) `fg` / keywords **bold** `#3a383d` | ![](https://placehold.co/16x16/999988/999988.png) comments *italic* `#999988` | ![](https://placehold.co/16x16/999999/999999.png) preprocessor **bold** `#999999` |
+| ![](https://placehold.co/16x16/dd1144/dd1144.png) strings `#dd1144` | ![](https://placehold.co/16x16/009999/009999.png) numbers `#009999` | ![](https://placehold.co/16x16/990000/990000.png) functions **bold** `#990000` | ![](https://placehold.co/16x16/445588/445588.png) types **bold** `#445588` |
+| ![](https://placehold.co/16x16/0086b3/0086b3.png) params / literals `#0086b3` | ![](https://placehold.co/16x16/008080/008080.png) properties / constants `#008080` | ![](https://placehold.co/16x16/990073/990073.png) symbols `#990073` | ![](https://placehold.co/16x16/009926/009926.png) regex `#009926` |
+
+### tanuki-night (GitLab Dark)
 
 | | | | |
 |---|---|---|---|
@@ -134,6 +157,15 @@ Full docs: `:help tanuki-night`.
 | ![](https://placehold.co/16x16/8abeb7/8abeb7.png) `aqua` `#8abeb7` | ![](https://placehold.co/16x16/81a2be/81a2be.png) `blue` `#81a2be` | ![](https://placehold.co/16x16/b294bb/b294bb.png) `purple` `#b294bb` | ![](https://placehold.co/16x16/453793/453793.png) `cursor nr` `#453793` |
 
 ## 🖼 Gallery
+
+<details>
+<summary>tanuki-day: C · Go · TypeScript · Lua</summary>
+
+![C](assets/day-c.png)
+![Go](assets/day-go.png)
+![TypeScript](assets/day-typescript.png)
+![Lua](assets/day-lua.png)
+</details>
 
 <details>
 <summary>C</summary>
@@ -191,19 +223,24 @@ Full docs: `:help tanuki-night`.
 
 | Tool | File | How |
 |---|---|---|
-| lualine | built in | `require("lualine").setup({ options = { theme = "tanuki-night" } })` |
-| NvChad | [`extras/nvchad/tanuki-night.lua`](extras/nvchad/tanuki-night.lua) | copy to `~/.config/nvim/lua/themes/`, pick with `<leader>th` |
-| kitty | [`extras/kitty/tanuki-night.conf`](extras/kitty/tanuki-night.conf) | `include tanuki-night.conf` in `kitty.conf` |
-| Ghostty | [`extras/ghostty/tanuki-night`](extras/ghostty/tanuki-night) | copy to `~/.config/ghostty/themes/`, set `theme = tanuki-night` |
-| Alacritty | [`extras/alacritty/tanuki-night.toml`](extras/alacritty/tanuki-night.toml) | `general.import = ["…/tanuki-night.toml"]` |
-| WezTerm | [`extras/wezterm/tanuki-night.toml`](extras/wezterm/tanuki-night.toml) | copy to a `color_schemes_dirs` folder, `color_scheme = "tanuki-night"` |
+Every extra comes in both styles (`tanuki-night.*` and `tanuki-day.*`).
 
-> NvChad users who want the Rust/Go query tweaks too: also install the plugin (lazy spec above, without `config`).
+| Tool | Files | How |
+|---|---|---|
+| lualine | built in | `require("lualine").setup({ options = { theme = "tanuki-night" } })` (or `"tanuki-day"`) |
+| NvChad | [`extras/nvchad/`](extras/nvchad) | copy to `~/.config/nvim/lua/themes/`, pick with `<leader>th` |
+| kitty | [`extras/kitty/`](extras/kitty) | `include tanuki-night.conf` in `kitty.conf` |
+| Ghostty | [`extras/ghostty/`](extras/ghostty) | copy to `~/.config/ghostty/themes/`, set `theme = tanuki-night` |
+| Alacritty | [`extras/alacritty/`](extras/alacritty) | `general.import = ["…/tanuki-night.toml"]` |
+| WezTerm | [`extras/wezterm/`](extras/wezterm) | copy to a `color_schemes_dirs` folder, `color_scheme = "tanuki-night"` |
+
+> NvChad users: also install the plugin (lazy spec above, without `config`) to get the
+> `queries/` tweaks — tanuki-day relies on them for many GitLab-specific rules.
 
 ## 🧪 Development
 
 ```sh
-make gen    # regenerate colors/tanuki-night.vim and everything in extras/
+make gen    # regenerate colors/*.vim and everything in extras/
 make test   # headless smoke tests
 make fmt    # stylua
 ```
@@ -216,13 +253,24 @@ To check a token's final color without opening Neovim:
 nvim --headless -u NONE -l scripts/inspect.lua tests/samples/sample.c ~/.local/share/nvim/site
 ```
 
+Check tanuki-day against GitLab light screenshots (`images/light/`, not in the repo) token by token:
+
+```sh
+python3 scripts/compare_light.py images/light day <parser-rtp> <download-cache>
+```
+
+It downloads each file from GitLab, renders the same lines with `scripts/tokens.lua`,
+classifies each token's color in the screenshot with `scripts/tok.py`, and lists the
+captures that disagree.
+
 Found a color that differs from GitLab? [Open an issue](https://github.com/MNnazrul/tanuki-night.nvim/issues/new/choose)
 with a GitLab screenshot of the same code.
 
 ## 🙏 Credits
 
-- [Tomorrow Night](https://github.com/chriskempson/tomorrow-theme) by Chris Kempson — the palette
-- GitLab's dark syntax highlighting theme — the token rules and UI colors
+- [Tomorrow Night](https://github.com/chriskempson/tomorrow-theme) by Chris Kempson — the night palette
+- GitLab's syntax highlighting themes — the token rules and UI colors; the light theme is
+  GitLab's port of [pygments-github-style](https://github.com/aahan/pygments-github-style)
 - [tokyonight.nvim](https://github.com/folke/tokyonight.nvim) — structure inspiration
 
 tanuki-night is not affiliated with or endorsed by GitLab Inc.

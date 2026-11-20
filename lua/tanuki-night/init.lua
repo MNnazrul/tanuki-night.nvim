@@ -6,34 +6,67 @@ function M.setup(opts)
   config.setup(opts)
 end
 
---- Palette after user `on_colors` hook.
-function M.colors()
-  local c = vim.deepcopy(require("tanuki-night.palette"))
+M.styles = { night = true, day = true }
+
+local function resolve(style)
+  style = style or config.options.style or (vim.g.colors_name == "tanuki-day" and "day" or "night")
+  assert(M.styles[style], "tanuki-night: unknown style " .. tostring(style))
+  return style
+end
+
+--- Palette after user `on_colors` hook. style: "night" (default) or "day".
+function M.colors(style)
+  style = resolve(style)
+  local c = vim.deepcopy(require(style == "day" and "tanuki-night.palette_day" or "tanuki-night.palette"))
   if config.options.on_colors then
-    config.options.on_colors(c)
+    config.options.on_colors(c, style)
   end
   return c
 end
 
---- Full highlight table { Group = spec }.
-function M.highlights()
+--- Full highlight table { Group = spec } for a style.
+function M.highlights(style)
+  style = resolve(style)
   local o = config.options
-  local c = M.colors()
+  local c = M.colors(style)
+  local suffix = style == "day" and "_day" or ""
   local hl = {}
-  for _, mod in ipairs({ "editor", "syntax", "treesitter", "languages", "lsp", "plugins" }) do
+  for _, mod in ipairs({ "editor", "syntax" .. suffix, "treesitter" .. suffix, "languages" .. suffix, "lsp", "plugins" }) do
     for k, v in pairs(require("tanuki-night.groups." .. mod)(c, o)) do
       hl[k] = v
     end
   end
   if o.on_highlights then
-    o.on_highlights(hl, c)
+    o.on_highlights(hl, c, style)
   end
   return hl, c
 end
 
 --- The 16 ANSI colors (also used by extras/ terminal themes).
-function M.terminal_colors(c)
-  c = c or M.colors()
+function M.terminal_colors(c, style)
+  style = resolve(style)
+  c = c or M.colors(style)
+  if style == "day" then
+    -- light: ANSI black must stay dark, white light
+    return {
+      c.fg,
+      c.red,
+      c.green,
+      c.yellow,
+      c.blue,
+      c.purple,
+      c.aqua,
+      c.bg_button,
+      c.fg_dim,
+      c.red,
+      c.green,
+      c.yellow,
+      c.blue,
+      c.purple,
+      c.aqua,
+      c.bg_dark,
+    }
+  end
   return {
     c.bg_alt,
     c.red,
@@ -54,18 +87,20 @@ function M.terminal_colors(c)
   }
 end
 
-function M.load()
+--- Apply the colorscheme. style: "night" (tanuki-night) or "day" (tanuki-day).
+function M.load(style)
+  style = resolve(style)
   if vim.g.colors_name then
     vim.cmd("hi clear")
   end
   vim.o.termguicolors = true
-  vim.o.background = "dark"
-  vim.g.colors_name = "tanuki-night"
+  vim.o.background = style == "day" and "light" or "dark"
+  vim.g.colors_name = style == "day" and "tanuki-day" or "tanuki-night"
 
-  local hl, c = M.highlights()
+  local hl, c = M.highlights(style)
   require("tanuki-night.util").apply(hl)
   if config.options.terminal_colors then
-    for i, col in ipairs(M.terminal_colors(c)) do
+    for i, col in ipairs(M.terminal_colors(c, style)) do
       vim.g["terminal_color_" .. (i - 1)] = col
     end
   end

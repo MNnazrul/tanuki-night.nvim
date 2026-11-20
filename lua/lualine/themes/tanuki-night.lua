@@ -1,4 +1,4 @@
-local c = require("tanuki-night").colors()
+local c = require("tanuki-night").colors("night")
 
 local function mode(color)
   return {

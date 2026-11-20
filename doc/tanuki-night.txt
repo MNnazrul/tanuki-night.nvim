@@ -1,4 +1,4 @@
-*tanuki-night.txt*      GitLab's dark syntax theme for Neovim and Vim
+*tanuki-night.txt*      GitLab's syntax themes for Neovim and Vim
 
 ==============================================================================
 CONTENTS                                               *tanuki-night-contents*
@@ -13,11 +13,15 @@ CONTENTS                                               *tanuki-night-contents*
 ==============================================================================
 1. INTRODUCTION                                           *tanuki-night-intro*
 
-tanuki-night recreates the code colors of GitLab's dark syntax theme: the
-Tomorrow Night palette with GitLab's own token rules, merge request diff
-colors, and UI accents. Token colors were matched per language against GitLab
-screenshots (C, C++, Rust, Zig, Python, Lua, Go, JS/TS, Ruby, Bash, CSS,
-YAML, TOML, JSON, Make, HTML).
+tanuki-night recreates the code colors of GitLab's syntax themes, with
+GitLab's own token rules, merge request diff colors, and UI accents:
+
+    tanuki-night    GitLab "Dark"  (Tomorrow Night palette)      *tanuki-night*
+    tanuki-day      GitLab "Light" (GitLab's white theme)          *tanuki-day*
+
+Token colors were matched per language against GitLab screenshots (C, C++,
+Rust, Zig, Python, Lua, Go, JS/TS, Vue, Ruby, Bash, CSS/SCSS, YAML, TOML,
+JSON, Make, HTML, Markdown).
 
 Requirements: Neovim >= 0.9 with 'termguicolors' (truecolor terminal).
 Vim 8+ works through the generated colors/tanuki-night.vim.
@@ -26,8 +30,11 @@ Vim 8+ works through the generated colors/tanuki-night.vim.
 2. USAGE                                                  *tanuki-night-usage*
 
 >vim
-    colorscheme tanuki-night
+    colorscheme tanuki-night   " dark
+    colorscheme tanuki-day     " light
 <
+`:set background=light` while tanuki-night is active switches to tanuki-day,
+and `:set background=dark` switches back.
 >lua
     vim.cmd.colorscheme("tanuki-night")
 <
@@ -49,8 +56,8 @@ Defaults:
         functions = {},
         strings = {},
       },
-      on_colors = function(colors) end,
-      on_highlights = function(hl, colors) end,
+      on_colors = function(colors, style) end,  -- style: "night" | "day"
+      on_highlights = function(hl, colors, style) end,
     })
 <
 ==============================================================================
@@ -75,24 +82,34 @@ To bring one back, set it in `on_highlights`, e.g.
 
 Get the palette from Lua:
 >lua
-    local c = require("tanuki-night").colors()
+    local night = require("tanuki-night").colors("night")
+    local day = require("tanuki-night").colors("day")
 <
 ==============================================================================
 5. PALETTE                                              *tanuki-night-palette*
 
+tanuki-night:
     bg       #1d1f21     red      #cc6666     comment  #969896
     fg       #c5c8c6     orange   #de935f     line_nr  #616264
     yellow   #f0c674     green    #b5bd68     visual   #2e3a4a
     aqua     #8abeb7     blue     #81a2be     purple   #b294bb
 
+tanuki-day (bold = **):
+    bg       #ffffff     keyword  #3a383d **  comment  #999988 (italic)
+    string   #dd1144     number   #009999     function #990000 **
+    type     #445588 **  param    #0086b3     property #008080
+    preproc  #999999 **  symbol   #990073     regex    #009926
+
 ==============================================================================
 6. EXTRAS                                                *tanuki-night-extras*
+
+Every extra exists for both styles (tanuki-night.*, tanuki-day.*).
 
     extras/nvchad/      NvChad base46 theme
     extras/kitty/       kitty
     extras/ghostty/     Ghostty
     extras/alacritty/   Alacritty
     extras/wezterm/     WezTerm
-    lualine             `theme = "tanuki-night"`
+    lualine             `theme = "tanuki-night"` or `"tanuki-day"`
 
  vim:tw=78:ts=8:noet:ft=help:norl:

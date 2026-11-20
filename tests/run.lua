@@ -54,20 +54,61 @@ vim.cmd.colorscheme("tanuki-night")
 check("on_colors", fg("@constant") == "#ff0000")
 require("tanuki-night").setup({})
 
+-- tanuki-day (GitLab "Light")
+ok, err = pcall(vim.cmd.colorscheme, "tanuki-day")
+check("day loads", ok, err)
+check("day colors_name", vim.g.colors_name == "tanuki-day")
+check("day background", vim.o.background == "light")
+local d = require("tanuki-night").colors("day")
+local function bold(group)
+  return vim.api.nvim_get_hl(0, { name = group, link = false }).bold == true
+end
+check("day Normal", bg("Normal") == "#ffffff" and fg("Normal") == d.fg)
+check("day keyword bold text color", fg("@keyword") == d.fg and bold("@keyword"))
+check("day function #900 bold", fg("@function") == "#990000" and bold("@function"))
+check("day type #458 bold", fg("@type") == "#445588" and bold("@type"))
+check("day string #d14", fg("@string") == "#dd1144")
+check("day number #099", fg("@number") == "#009999")
+check("day comment #998 italic", fg("@comment") == "#999988")
+check("day param #0086b3", fg("@variable.parameter") == "#0086b3")
+check("day C static is a type", fg("@keyword.modifier.c") == "#445588")
+check("day #define meta", fg("@tanuki.preproc") == "#999999" and bold("@tanuki.preproc"))
+check("day diff added", bg("DiffAdd") == "#ecfdf0")
+check("day terminal black is dark", vim.g.terminal_color_0 == d.fg)
+
+-- :set background switches between the two
+vim.o.background = "dark"
+check("bg=dark -> night", vim.g.colors_name == "tanuki-night" and bg("Normal") == c.bg)
+vim.o.background = "light"
+check("bg=light -> day", vim.g.colors_name == "tanuki-day")
+check(
+  "night leaves @tanuki.* empty",
+  (function()
+    vim.cmd.colorscheme("tanuki-night")
+    return vim.tbl_isempty(vim.api.nvim_get_hl(0, { name = "@tanuki.preproc" }))
+  end)()
+)
+
 -- extras load
 check("lualine theme", pcall(require, "lualine.themes.tanuki-night"))
-local nvchad = loadfile("extras/nvchad/tanuki-night.lua")
-check("nvchad theme parses", nvchad ~= nil)
+check("lualine day theme", pcall(require, "lualine.themes.tanuki-day"))
+check("nvchad theme parses", loadfile("extras/nvchad/tanuki-night.lua") ~= nil)
+check("nvchad day theme parses", loadfile("extras/nvchad/tanuki-day.lua") ~= nil)
 
--- every group spec is valid
-local hl = require("tanuki-night").highlights()
-local bad = {}
-for name, spec in pairs(hl) do
-  if type(spec) ~= "string" and type(spec) ~= "table" then
-    bad[#bad + 1] = name
+-- every group spec is valid, every link target exists
+for _, style in ipairs({ "night", "day" }) do
+  local hl = require("tanuki-night").highlights(style)
+  local bad = {}
+  for name, spec in pairs(hl) do
+    local target = type(spec) == "string" and spec or (type(spec) == "table" and spec.link)
+    if type(spec) ~= "string" and type(spec) ~= "table" then
+      bad[#bad + 1] = name
+    elseif target and not hl[target] and vim.tbl_isempty(vim.api.nvim_get_hl(0, { name = target })) then
+      bad[#bad + 1] = name .. "->" .. target
+    end
   end
+  check(style .. " group specs valid", #bad == 0, table.concat(bad, ", "))
 end
-check("group specs valid", #bad == 0, table.concat(bad, ", "))
 
 print(("\n%d failure(s)"):format(failures))
 if failures > 0 then

@@ -9,3 +9,6 @@
 
 # tool caches
 .impeccable/
+
+# python caches
+__pycache__/

@@ -1,0 +1,98 @@
+*tanuki-night.txt*      GitLab's dark syntax theme for Neovim and Vim
+
+==============================================================================
+CONTENTS                                               *tanuki-night-contents*
+
+  1. Introduction ............................... |tanuki-night-intro|
+  2. Usage ...................................... |tanuki-night-usage|
+  3. Configuration .............................. |tanuki-night-config|
+  4. Overriding ................................. |tanuki-night-override|
+  5. Palette .................................... |tanuki-night-palette|
+  6. Extras ..................................... |tanuki-night-extras|
+
+==============================================================================
+1. INTRODUCTION                                           *tanuki-night-intro*
+
+tanuki-night recreates the code colors of GitLab's dark syntax theme: the
+Tomorrow Night palette with GitLab's own token rules, merge request diff
+colors, and UI accents. Token colors were matched per language against GitLab
+screenshots (C, C++, Rust, Zig, Python, Lua, Go, JS/TS, Ruby, Bash, CSS,
+YAML, TOML, JSON, Make, HTML).
+
+Requirements: Neovim >= 0.9 with 'termguicolors' (truecolor terminal).
+Vim 8+ works through the generated colors/tanuki-night.vim.
+
+==============================================================================
+2. USAGE                                                  *tanuki-night-usage*
+
+>vim
+    colorscheme tanuki-night
+<
+>lua
+    vim.cmd.colorscheme("tanuki-night")
+<
+Call |tanuki-night.setup()| before loading the colorscheme to change options.
+
+==============================================================================
+3. CONFIGURATION                         *tanuki-night-config* *tanuki-night.setup()*
+
+Defaults:
+>lua
+    require("tanuki-night").setup({
+      transparent = false,       -- no background on Normal, SignColumn, ...
+      terminal_colors = true,    -- set vim.g.terminal_color_0..15
+      gitlab_cursorline = false, -- GitLab's orange "#L" line as CursorLine
+      dim_inactive = false,      -- darker background for inactive windows
+      styles = {                 -- any nvim_set_hl() attributes
+        comments = {},           -- e.g. { italic = true }
+        keywords = {},
+        functions = {},
+        strings = {},
+      },
+      on_colors = function(colors) end,
+      on_highlights = function(hl, colors) end,
+    })
+<
+==============================================================================
+4. OVERRIDING                                          *tanuki-night-override*
+
+Change palette colors with `on_colors`, and groups with `on_highlights`.
+A string value links to another group.
+>lua
+    require("tanuki-night").setup({
+      on_colors = function(c)
+        c.comment = "#7f8180"
+      end,
+      on_highlights = function(hl, c)
+        hl.CursorLine = { bg = c.bg_alt2 }
+        hl["@variable.parameter"] = "@variable"
+      end,
+    })
+<
+LSP semantic tokens are mostly cleared so Treesitter keeps GitLab's look.
+To bring one back, set it in `on_highlights`, e.g.
+`hl["@lsp.type.parameter"] = "@variable.parameter"`.
+
+Get the palette from Lua:
+>lua
+    local c = require("tanuki-night").colors()
+<
+==============================================================================
+5. PALETTE                                              *tanuki-night-palette*
+
+    bg       #1d1f21     red      #cc6666     comment  #969896
+    fg       #c5c8c6     orange   #de935f     line_nr  #616264
+    yellow   #f0c674     green    #b5bd68     visual   #2e3a4a
+    aqua     #8abeb7     blue     #81a2be     purple   #b294bb
+
+==============================================================================
+6. EXTRAS                                                *tanuki-night-extras*
+
+    extras/nvchad/      NvChad base46 theme
+    extras/kitty/       kitty
+    extras/ghostty/     Ghostty
+    extras/alacritty/   Alacritty
+    extras/wezterm/     WezTerm
+    lualine             `theme = "tanuki-night"`
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

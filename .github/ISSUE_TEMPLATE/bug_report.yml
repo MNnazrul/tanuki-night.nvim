@@ -1,0 +1,25 @@
+name: Bug report
+description: Wrong color, missing plugin support, or an error
+labels: [bug]
+body:
+  - type: textarea
+    attributes:
+      label: What looks wrong?
+      description: Screenshot please. If it's a token color, a GitLab screenshot of the same code helps a lot.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: ":Inspect output"
+      description: Put the cursor on the token and paste the output of `:Inspect`.
+      render: text
+  - type: input
+    attributes:
+      label: Language / plugin
+      placeholder: e.g. Swift, telescope.nvim
+  - type: input
+    attributes:
+      label: Neovim version
+      description: Output of `nvim --version | head -1`
+    validations:
+      required: true

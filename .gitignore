@@ -1,0 +1,11 @@
+# local research material (GitLab screenshots, notes) — not published
+/images/
+/HANDOFF*.md
+
+/doc/tags
+/.tests/
+*.log
+.DS_Store
+
+# tool caches
+.impeccable/

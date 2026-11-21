@@ -49,13 +49,15 @@ GitLab is the reference, so show the same code in both places:
 - A screenshot of the same code in **Neovim** with tanuki-night or tanuki-day.
 - The output of **`:Inspect`** with the cursor on the wrong token. It shows which Treesitter
   captures and highlight groups apply, which usually points straight at the fix.
-- Your Neovim version, and whether a **Treesitter parser** is installed for the language
-  (`:InspectTree` opens a tree if it is). Without a parser Neovim falls back to Vim's regex
-  syntax and tanuki-day's language rules can't apply.
+- The output of **`:checkhealth tanuki-night`**. It shows your Neovim version, whether a
+  **Treesitter parser** is installed for the language, and whether the queries compile.
+  Without a parser Neovim falls back to Vim's regex syntax and tanuki-day's language rules
+  can't apply.
 
 ### What makes a good bug report
 
 - What happened, what you expected, and any error message.
+- The output of `:checkhealth tanuki-night`.
 - Steps to reproduce, starting from a minimal config. The **Bug report** template includes a
   `repro.lua` you can run with `nvim -u repro.lua`. It installs everything into `./.repro`, so
   your own config isn't touched, and it rules out conflicts with other plugins.

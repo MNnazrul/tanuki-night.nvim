@@ -18,7 +18,7 @@ body:
           required: true
         - label: I updated tanuki-night to the latest version
           required: true
-        - label: A Treesitter parser is installed for this language (`:InspectTree` opens a tree)
+        - label: "`:checkhealth tanuki-night` shows a parser for this language"
           required: false
   - type: dropdown
     attributes:
@@ -53,6 +53,13 @@ body:
     attributes:
       label: ":Inspect output"
       description: Put the cursor on the wrong token and paste the output of `:Inspect`.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: ":checkhealth tanuki-night output"
+      description: Run `:checkhealth tanuki-night` and paste the output.
       render: text
     validations:
       required: true

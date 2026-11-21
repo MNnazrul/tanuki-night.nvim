@@ -46,7 +46,9 @@ call s:check('night + bg=light -> day', s:is('tanuki-day', 'light', s:day))
 set background=dark
 call s:check('day + bg=dark -> night', s:is('tanuki-night', 'dark', s:night))
 
-colorscheme default
+" start from no colorscheme (not every Vim ships colors/default.vim)
+highlight clear
+unlet! g:colors_name
 set background=light
 colorscheme tanuki-night
 call s:check('bg=light then :colo tanuki-night', s:is('tanuki-night', 'dark', s:night))

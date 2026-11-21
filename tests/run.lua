@@ -129,7 +129,12 @@ do
 
   vim.cmd.colorscheme("tanuki-night")
   local ok, err = pcall(vim.cmd, "silent checkhealth tanuki-night")
-  local report = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n")
+  -- newer Neovim fills the report asynchronously, so wait for it
+  local buf, report = vim.api.nvim_get_current_buf(), ""
+  vim.wait(10000, function()
+    report = table.concat(vim.api.nvim_buf_get_lines(buf, 0, -1, false), "\n")
+    return report:find("Treesitter") ~= nil
+  end, 50)
   check("checkhealth runs", ok, err)
   check(
     "checkhealth sections",

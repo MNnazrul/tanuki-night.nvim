@@ -4,6 +4,8 @@ vim.opt.rtp:prepend(vim.fn.getcwd())
 
 for _, style in ipairs({ "night", "day" }) do
   local name = "tanuki-" .. style
+  local other = style == "day" and "tanuki-night" or "tanuki-day"
+  local other_bg = style == "day" and "dark" or "light"
   local hl = require("tanuki-night").highlights(style)
 
   local names = {}
@@ -30,6 +32,13 @@ for _, style in ipairs({ "night", "day" }) do
     '" Neovim reads colors/*.vim before *.lua, so hand off to the full Lua theme there.',
     "if has('nvim')",
     ("  runtime colors/%s.lua"):format(name),
+    "  finish",
+    "endif",
+    "",
+    "\" Vim re-sources the active colorscheme when 'background' changes:",
+    ('" ":set background=%s" while %s is active switches to %s.'):format(other_bg, name, other),
+    ("if get(g:, 'colors_name', '') ==# '%s' && &background ==# '%s'"):format(name, other_bg),
+    ("  runtime colors/%s.vim"):format(other),
     "  finish",
     "endif",
     "",

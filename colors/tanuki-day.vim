@@ -6,6 +6,13 @@ if has('nvim')
   finish
 endif
 
+" Vim re-sources the active colorscheme when 'background' changes:
+" ":set background=dark" while tanuki-day is active switches to tanuki-night.
+if get(g:, 'colors_name', '') ==# 'tanuki-day' && &background ==# 'dark'
+  runtime colors/tanuki-night.vim
+  finish
+endif
+
 set background=light
 hi clear
 if exists('syntax_on') | syntax reset | endif

@@ -55,6 +55,11 @@ body:
       required: true
   - type: textarea
     attributes:
+      label: ":checkhealth tanuki-night output"
+      description: Run `:checkhealth tanuki-night` and paste the output.
+      render: text
+  - type: textarea
+    attributes:
       label: Repro
       description: |
         A minimal config that shows the bug. Save it as `repro.lua` and run `nvim -u repro.lua`.

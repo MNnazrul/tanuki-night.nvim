@@ -4,10 +4,10 @@ vim.opt.rtp:prepend(vim.fn.getcwd())
 local failures = 0
 local function check(name, cond, msg)
   if cond then
-    print("ok   " .. name)
+    io.stdout:write("ok   " .. name .. "\n")
   else
     failures = failures + 1
-    print("FAIL " .. name .. (msg and (": " .. msg) or ""))
+    io.stdout:write("FAIL " .. name .. (msg and (": " .. msg) or "") .. "\n")
   end
 end
 
@@ -114,6 +114,36 @@ for _, style in ipairs({ "night", "day" }) do
   check(style .. " group specs valid", #bad == 0, table.concat(bad, ", "))
 end
 
+-- :checkhealth tanuki-night
+do
+  local health = require("tanuki-night.health")
+  local defaults = require("tanuki-night.config").defaults
+  local unknown = health.unknown_options({
+    transparent = true,
+    on_colors = function() end,
+    styles = { comments = { italic = true }, coments = {} },
+    transparant = true,
+  }, defaults)
+  check("health finds unknown options", table.concat(unknown, ",") == "styles.coments,transparant")
+  check("health accepts valid options", #health.unknown_options(require("tanuki-night.config").options, defaults) == 0)
+
+  vim.cmd.colorscheme("tanuki-night")
+  local ok, err = pcall(vim.cmd, "silent checkhealth tanuki-night")
+  -- newer Neovim fills the report asynchronously, so wait for it
+  local buf, report = vim.api.nvim_get_current_buf(), ""
+  vim.wait(10000, function()
+    report = table.concat(vim.api.nvim_buf_get_lines(buf, 0, -1, false), "\n")
+    return report:find("Treesitter") ~= nil
+  end, 50)
+  check("checkhealth runs", ok, err)
+  check(
+    "checkhealth sections",
+    report:find("Neovim") and report:find("Colors") and report:find("Configuration") and report:find("Treesitter"),
+    report
+  )
+  vim.cmd("bwipeout!")
+end
+
 -- every @tanuki.* capture used in queries/ has a tanuki-day group
 do
   local day = require("tanuki-night").highlights("day")
@@ -140,7 +170,7 @@ do
   check("day colors every @tanuki capture", #missing == 0, table.concat(missing, ", "))
 end
 
-print(("\n%d failure(s)"):format(failures))
+io.stdout:write(("\n%d failure(s)\n"):format(failures))
 if failures > 0 then
   os.exit(1)
 end

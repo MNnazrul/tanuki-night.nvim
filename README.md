@@ -56,6 +56,9 @@ token by token against GitLab screenshots.
   Without a parser, a language falls back to Vim's simpler regex highlighting, and
   tanuki-day's language rules can't apply.
 
+Run `:checkhealth tanuki-night` to check all of this, including which languages are missing a
+parser and whether your `setup()` options have typos.
+
 ## 📦 Installation
 
 ### [lazy.nvim](https://github.com/folke/lazy.nvim)
@@ -262,6 +265,7 @@ Every extra comes in both styles: `tanuki-night.*` and `tanuki-day.*`.
   `.js` rules.
 - **No parser, no language rules**: a language without a Treesitter parser uses Vim's regex
   syntax, which gets the base colors but not GitLab's per-language details.
+  `:checkhealth tanuki-night` lists the languages that are missing one.
 - **Bold** needs a terminal font with a bold face. tanuki-day relies on it more than night does.
 
 ## 🧪 Development

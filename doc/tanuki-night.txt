@@ -9,6 +9,7 @@ CONTENTS                                               *tanuki-night-contents*
   4. Overriding ................................. |tanuki-night-override|
   5. Palette .................................... |tanuki-night-palette|
   6. Extras ..................................... |tanuki-night-extras|
+  7. Troubleshooting ............................ |tanuki-night-health|
 
 ==============================================================================
 1. INTRODUCTION                                           *tanuki-night-intro*
@@ -111,5 +112,28 @@ Every extra exists for both styles (tanuki-night.*, tanuki-day.*).
     extras/alacritty/   Alacritty
     extras/wezterm/     WezTerm
     lualine             `theme = "tanuki-night"` or `"tanuki-day"`
+
+==============================================================================
+7. TROUBLESHOOTING                                       *tanuki-night-health*
+
+Colors don't match GitLab, or something looks off? Run: >vim
+    :checkhealth tanuki-night
+<
+It checks:
+
+    Neovim          version (0.9+) and the active colorscheme
+    Colors          'termguicolors' and whether the terminal reports
+                    truecolor ($COLORTERM)
+    Configuration   setup() options it doesn't know, e.g. a typo like
+                    "transparant"
+    Treesitter      which of the supported languages have a parser, and
+                    whether tanuki-night's queries compile with them
+
+Most differences from GitLab come from a missing Treesitter parser: without
+one, Vim's regex syntax is used and the per-language rules can't apply.
+Install it with nvim-treesitter, e.g. `:TSInstall rust`. If a query doesn't
+compile, the parser is older than the queries: update it with `:TSUpdate`.
+
+Please include the output when you open an issue.
 
  vim:tw=78:ts=8:noet:ft=help:norl:

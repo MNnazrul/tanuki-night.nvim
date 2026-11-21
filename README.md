@@ -71,6 +71,10 @@ token by token against GitLab screenshots.
 }
 ```
 
+To get only released versions instead of the latest `main`, add `version = "*"` to the spec.
+Changes are listed in the [changelog](CHANGELOG.md) and on the
+[releases page](https://github.com/MNnazrul/tanuki-night.nvim/releases).
+
 ### Built-in `vim.pack` (Neovim 0.12+)
 
 ```lua
@@ -263,11 +267,13 @@ Every extra comes in both styles: `tanuki-night.*` and `tanuki-day.*`.
 ## 🧪 Development
 
 ```sh
-make gen       # regenerate colors/*.vim and everything in extras/
-make test      # headless Neovim tests (both styles)
-make test-vim  # tests for the generated Vim colorschemes
-make fmt       # format with stylua
-make lint      # check formatting
+make gen           # regenerate colors/*.vim and everything in extras/
+make test          # headless Neovim tests (both styles)
+make test-vim      # tests for the generated Vim colorschemes
+make parsers       # build Treesitter parsers for test-queries (once)
+make test-queries  # check queries/*.scm against real parsers
+make fmt           # format with stylua
+make lint          # check formatting
 ```
 
 Never edit generated files by hand. Change `lua/tanuki-night/` and run `make gen`.

@@ -24,6 +24,10 @@ end
 local ok, err = pcall(vim.cmd.colorscheme, "tanuki-night")
 check("colorscheme loads", ok, err)
 check("colors_name", vim.g.colors_name == "tanuki-night")
+check(
+  "version is semver",
+  type(require("tanuki-night").version) == "string" and require("tanuki-night").version:match("^%d+%.%d+%.%d+$") ~= nil
+)
 
 -- GitLab dark mapping
 local c = require("tanuki-night").colors()
@@ -108,6 +112,32 @@ for _, style in ipairs({ "night", "day" }) do
     end
   end
   check(style .. " group specs valid", #bad == 0, table.concat(bad, ", "))
+end
+
+-- every @tanuki.* capture used in queries/ has a tanuki-day group
+do
+  local day = require("tanuki-night").highlights("day")
+  local missing = {}
+  for _, file in ipairs(vim.fn.glob("queries/*/highlights.scm", true, true)) do
+    for line in io.lines(file) do
+      if not line:match("^%s*;") then
+        for cap in line:gmatch("@(tanuki[%w%._]*)") do
+          local name, found = cap, false
+          while name do -- Neovim falls back from @a.b.c to @a.b to @a
+            if day["@" .. name] then
+              found = true
+              break
+            end
+            name = name:match("^(.*)%.[^.]+$")
+          end
+          if not found and not vim.tbl_contains(missing, cap) then
+            missing[#missing + 1] = cap
+          end
+        end
+      end
+    end
+  end
+  check("day colors every @tanuki capture", #missing == 0, table.concat(missing, ", "))
 end
 
 print(("\n%d failure(s)"):format(failures))

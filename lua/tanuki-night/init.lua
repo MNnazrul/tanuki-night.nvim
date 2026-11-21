@@ -2,6 +2,9 @@ local config = require("tanuki-night.config")
 
 local M = {}
 
+--- Current release, updated by release-please.
+M.version = "0.0.0" -- x-release-please-version
+
 function M.setup(opts)
   config.setup(opts)
 end

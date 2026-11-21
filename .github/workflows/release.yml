@@ -1,0 +1,23 @@
+name: Release
+
+# release-please keeps one "chore(main): release x.y.z" pull request open and
+# updated after every push to main. Merging that pull request creates the
+# vX.Y.Z tag and the GitHub Release. See CONTRIBUTING.md#releasing.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v5
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json

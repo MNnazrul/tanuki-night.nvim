@@ -12,7 +12,9 @@ to fix a color.
 - [Adding plugin support](#adding-plugin-support)
 - [Changing the palette or extras](#changing-the-palette-or-extras)
 - [Testing](#testing)
+- [Pull request titles and commit messages](#pull-request-titles-and-commit-messages)
 - [Opening a pull request](#opening-a-pull-request)
+- [Releasing](#releasing)
 
 ## Ways to contribute
 
@@ -193,11 +195,53 @@ make test-vim   # Vim tests for the generated colors/*.vim
 make lint       # StyLua check (make fmt fixes it)
 ```
 
-CI runs the same checks on Neovim stable and nightly and on Vim, and **fails if generated
-files are out of date**.
+If you changed anything in `queries/`, also run the Treesitter query tests. They need real
+parsers, so build them once first (needs git, a C compiler and the
+[tree-sitter CLI](https://github.com/tree-sitter/tree-sitter/releases)):
+
+```sh
+make parsers        # builds parsers into .tests/ts (ignored by git)
+make test-queries   # every query compiles and every sample highlights without errors
+```
+
+CI runs all of these: StyLua, the Neovim tests on 0.9 (the oldest supported version), stable
+and nightly, the Vim tests, and the query tests. It also **fails if generated files are out of
+date**.
 
 If you add an option or change behavior, add a test to `tests/run.lua` (and `tests/run.vim` if
 it affects Vim), and update `README.md` and `doc/tanuki-night.txt`.
+
+## Pull request titles and commit messages
+
+Pull requests are **squash-merged**, and the pull request title becomes the commit message on
+`main`. Releases are made from those messages (see [Releasing](#releasing)), so titles follow
+[Conventional Commits](https://www.conventionalcommits.org/): `type(scope): subject`.
+
+| Type | Use it for | Release |
+|---|---|---|
+| `fix` | a wrong color, a bug | patch (1.0.**1**) |
+| `feat` | plugin support, language rules, an extra, a new option | minor (1.**1**.0) |
+| `perf` | faster loading | patch |
+| `docs` | README, `doc/`, CONTRIBUTING | none on its own |
+| `refactor`, `style`, `test`, `ci`, `build`, `chore` | internal changes | none on its own |
+
+- The scope is optional: usually a language, plugin or extra, like `fix(rust): ...` or
+  `feat(telescope): ...`.
+- Start the subject with a lowercase letter and don't end it with a period.
+- A change that breaks existing configs (a removed option, a renamed palette key) gets a `!`:
+  `feat!: rename bg_alt to bg_float`. That makes a major release (**2**.0.0).
+
+Examples:
+
+```text
+fix(rust): color attributes like GitLab
+feat(neogit): add highlight groups
+feat(extras): add foot terminal theme
+docs: explain on_highlights
+```
+
+A check on every pull request makes sure the title follows these rules. Commit messages
+inside your branch don't matter, since they're squashed into one.
 
 ## Opening a pull request
 
@@ -207,11 +251,35 @@ it affects Vim), and update `README.md` and `doc/tanuki-night.txt`.
 3. Link the issue it fixes with `Fixes #123` in the description.
 4. For color changes, add **before/after screenshots**, plus a GitLab screenshot of the same
    code if you can.
-5. Write commit messages in the imperative, as if completing "If applied, this commit will...":
-   `Fix Rust attribute color`, not `Fixed rust colors`.
+5. Give it a [Conventional Commits title](#pull-request-titles-and-commit-messages), like
+   `fix(rust): color attributes like GitLab`.
 
-If CI fails, check the log: most failures are formatting (`make fmt`) or generated files that
-weren't committed (`make gen`).
+If CI fails, check the log: most failures are formatting (`make fmt`), generated files that
+weren't committed (`make gen`), or a pull request title that doesn't follow the rules above.
+
+## Releasing
+
+*This part is for the maintainer.* Releases are automated with
+[release-please](https://github.com/googleapis/release-please), the same setup tokyonight.nvim
+uses:
+
+1. After every merge to `main`, release-please opens or updates **one** pull request named
+   `chore(main): release x.y.z`. It bumps the version (in `version.txt`,
+   `.release-please-manifest.json` and `require("tanuki-night").version`) and adds the merged
+   `feat`/`fix` changes to `CHANGELOG.md`.
+2. Nothing is released until that pull request is merged, so changes can collect in it.
+3. **Merging it** creates the `vX.Y.Z` tag and a GitHub Release with the changelog as notes.
+
+The version comes from the commit types (`fix` → patch, `feat` → minor, `!` → major). To pick
+the version yourself, add a `Release-As` footer to any commit on `main`:
+
+```text
+chore: release 2.0.0
+
+Release-As: 2.0.0
+```
+
+Users who want only released versions can pin to tags, e.g. `version = "*"` in lazy.nvim.
 
 ## License
 

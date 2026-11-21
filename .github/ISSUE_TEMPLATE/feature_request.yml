@@ -1,0 +1,39 @@
+name: Feature request
+description: Support a plugin, a language, a terminal, or a new option
+title: "feature: "
+labels: [enhancement]
+body:
+  - type: checkboxes
+    attributes:
+      label: Before you open this
+      options:
+        - label: I checked the README's Plugin support and Extras lists
+          required: true
+        - label: I searched the existing issues
+          required: true
+  - type: dropdown
+    attributes:
+      label: What kind of feature?
+      options:
+        - Plugin support
+        - Language rules (match GitLab for a new language)
+        - Extra (terminal or other app theme)
+        - New option
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Describe what you'd like
+      description: For plugins, link the plugin's repo. For languages, a GitLab screenshot of some code helps a lot.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Alternatives you've considered
+      description: For example an `on_highlights` override you use today.
+  - type: checkboxes
+    attributes:
+      label: Contributing
+      options:
+        - label: I'd like to open a pull request for this myself

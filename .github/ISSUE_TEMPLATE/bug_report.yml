@@ -1,25 +1,84 @@
 name: Bug report
-description: Wrong color, missing plugin support, or an error
+description: An error, a broken option, or a plugin that looks wrong
+title: "bug: "
 labels: [bug]
 body:
-  - type: textarea
+  - type: markdown
     attributes:
-      label: What looks wrong?
-      description: Screenshot please. If it's a token color, a GitLab screenshot of the same code helps a lot.
+      value: |
+        **Before** you report a bug, read the [README](https://github.com/MNnazrul/tanuki-night.nvim#readme)
+        (especially **Limitations**) and search [existing issues](https://github.com/MNnazrul/tanuki-night.nvim/issues?q=is%3Aissue).
+
+        A token that's colored differently from GitLab? Use the **Wrong color** template instead.
+  - type: checkboxes
+    attributes:
+      label: Before you open this
+      options:
+        - label: I read the README and its Limitations section
+          required: true
+        - label: I updated tanuki-night to the latest version
+          required: true
+        - label: I searched the existing issues
+          required: true
+  - type: input
+    attributes:
+      label: Neovim or Vim version
+      description: Output of `nvim --version | head -1` or `vim --version | head -1`
+      placeholder: NVIM v0.11.4
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Operating system and terminal
+      placeholder: macOS 15, Ghostty 1.2
     validations:
       required: true
   - type: textarea
     attributes:
-      label: ":Inspect output"
-      description: Put the cursor on the token and paste the output of `:Inspect`.
-      render: text
-  - type: input
-    attributes:
-      label: Language / plugin
-      placeholder: e.g. Swift, telescope.nvim
-  - type: input
-    attributes:
-      label: Neovim version
-      description: Output of `nvim --version | head -1`
+      label: Describe the bug
+      description: What happened? Include any error message and a screenshot if it's visual.
     validations:
       required: true
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. nvim -u repro.lua
+        2. :colorscheme tanuki-day
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Repro
+      description: |
+        A minimal config that shows the bug. Save it as `repro.lua` and run `nvim -u repro.lua`.
+        It installs everything into `./.repro`, so your own config isn't touched.
+      value: |
+        vim.env.LAZY_STDPATH = ".repro"
+        load(vim.fn.system("curl -s https://raw.githubusercontent.com/folke/lazy.nvim/main/bootstrap.lua"))()
+
+        require("lazy.minit").repro({
+          spec = {
+            {
+              "MNnazrul/tanuki-night.nvim",
+              lazy = false,
+              priority = 1000,
+              opts = {
+                -- your tanuki-night options here
+              },
+            },
+            -- add any other plugins needed to show the bug
+          },
+        })
+
+        -- after repro(), which otherwise loads its default colorscheme
+        vim.cmd.colorscheme("tanuki-night") -- or "tanuki-day"
+      render: lua
+    validations:
+      required: false

@@ -263,10 +263,11 @@ Every extra comes in both styles: `tanuki-night.*` and `tanuki-day.*`.
 ## 🧪 Development
 
 ```sh
-make gen    # regenerate colors/*.vim and everything in extras/
-make test   # headless tests (both styles)
-make fmt    # format with stylua
-make lint   # check formatting
+make gen       # regenerate colors/*.vim and everything in extras/
+make test      # headless Neovim tests (both styles)
+make test-vim  # tests for the generated Vim colorschemes
+make fmt       # format with stylua
+make lint      # check formatting
 ```
 
 Never edit generated files by hand. Change `lua/tanuki-night/` and run `make gen`.
@@ -289,9 +290,16 @@ and lists the captures that disagree.
 python3 scripts/compare_light.py <shots-dir> day <parser-dir> <download-cache>
 ```
 
-Found a color that differs from GitLab?
-[Open an issue](https://github.com/MNnazrul/tanuki-night.nvim/issues/new/choose) with a
-GitLab screenshot of the same code.
+## 🤝 Contributing
+
+Issues and pull requests are welcome!
+
+- **Found a color that differs from GitLab?** [Open a "Wrong color" issue](https://github.com/MNnazrul/tanuki-night.nvim/issues/new?template=wrong_color.yml)
+  with a GitLab screenshot of the same code and the `:Inspect` output for the token.
+- **Found a bug or want a feature?** [Open an issue](https://github.com/MNnazrul/tanuki-night.nvim/issues/new/choose)
+  and pick a template. Please search [existing issues](https://github.com/MNnazrul/tanuki-night.nvim/issues?q=is%3Aissue) first.
+- **Want to send a fix?** Read [CONTRIBUTING.md](CONTRIBUTING.md) for the setup, the code layout,
+  how to fix a color or add plugin support, and the pull request checklist.
 
 ## 🙏 Credits
 

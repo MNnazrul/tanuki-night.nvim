@@ -1,1 +1,8 @@
-blank_issues_enabled: true
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/MNnazrul/tanuki-night.nvim#readme
+    about: Installation, configuration and known limitations. Also available as `:help tanuki-night`.
+  - name: Contributing guide
+    url: https://github.com/MNnazrul/tanuki-night.nvim/blob/main/CONTRIBUTING.md
+    about: How to fix a color, add plugin support, and open a pull request.

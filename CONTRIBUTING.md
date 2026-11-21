@@ -264,7 +264,7 @@ weren't committed (`make gen`), or a pull request title that doesn't follow the 
 uses:
 
 1. After every merge to `main`, release-please opens or updates **one** pull request named
-   `chore(main): release x.y.z`. It bumps the version (in `version.txt`,
+   `chore(main): release x.y.z`. It bumps the version (in
    `.release-please-manifest.json` and `require("tanuki-night").version`) and adds the merged
    `feat`/`fix` changes to `CHANGELOG.md`.
 2. Nothing is released until that pull request is merged, so changes can collect in it.

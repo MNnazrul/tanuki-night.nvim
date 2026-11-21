@@ -99,6 +99,15 @@ check("lualine day theme", pcall(require, "lualine.themes.tanuki-day"))
 check("nvchad theme parses", loadfile("extras/nvchad/tanuki-night.lua") ~= nil)
 check("nvchad day theme parses", loadfile("extras/nvchad/tanuki-day.lua") ~= nil)
 
+-- nearest xterm-256 colors (used for cterm colors in colors/*.vim)
+do
+  local to_256 = require("tanuki-night.util").to_256
+  check("to_256 black and white", to_256("#000000") == 16 and to_256("#ffffff") == 231)
+  check("to_256 grey stays grey", to_256("#808080") == 244)
+  check("to_256 tinted stays tinted", to_256("#ecfdf0") == 194 and to_256("#283627") < 232)
+  check("to_256 avoid", to_256("#ffffff", 231) ~= 231 and to_256("#ffffff", { [231] = true }) ~= 231)
+end
+
 -- every group spec is valid, every link target exists
 for _, style in ipairs({ "night", "day" }) do
   local hl = require("tanuki-night").highlights(style)

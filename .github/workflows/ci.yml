@@ -4,25 +4,37 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   stylua:
+    name: StyLua
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: JohnnyMorganz/stylua-action@v4
+      - uses: actions/checkout@v7
+      - uses: JohnnyMorganz/stylua-action@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          version: 2.3.1
+          version: 2.6.0
           args: --check lua colors scripts tests
 
   test:
+    name: Neovim ${{ matrix.nvim }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        nvim: [stable, nightly]
+        # oldest supported (README says 0.9+), current stable, nightly
+        nvim: [v0.9.5, stable, nightly]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: rhysd/action-setup-vim@v1
         with:
           neovim: true
@@ -30,17 +42,49 @@ jobs:
       - name: Tests
         run: make test
       - name: Generated files are up to date
+        if: matrix.nvim == 'stable'
         run: |
           make gen
           git diff --exit-code -- colors extras
 
   vim:
+    name: Vim
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: rhysd/action-setup-vim@v1
         id: vim
         with:
           version: stable
       - name: Tests
         run: make test-vim VIM=${{ steps.vim.outputs.executable }}
+
+  queries:
+    name: Treesitter queries
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: stable
+      - name: Install tree-sitter CLI
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -fsSL https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-linux-x64.gz \
+            | gunzip > "$HOME/.local/bin/tree-sitter"
+          chmod +x "$HOME/.local/bin/tree-sitter"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Get nvim-treesitter
+        id: nvim-ts
+        run: |
+          git clone --depth 1 --branch main https://github.com/nvim-treesitter/nvim-treesitter .tests/nvim-treesitter
+          echo "sha=$(git -C .tests/nvim-treesitter rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v6
+        with:
+          path: .tests/ts
+          key: parsers-${{ steps.nvim-ts.outputs.sha }}
+      - name: Build parsers
+        run: make parsers
+      - name: Tests
+        run: make test-queries

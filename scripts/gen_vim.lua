@@ -7,6 +7,40 @@ for _, style in ipairs({ "night", "day" }) do
   local other = style == "day" and "tanuki-night" or "tanuki-day"
   local other_bg = style == "day" and "dark" or "light"
   local hl = require("tanuki-night").highlights(style)
+  local to_256 = require("tanuki-night.util").to_256
+
+  -- "#rrggbb" -> nearest xterm-256 index, for terminals without truecolor
+  local function is_hex(color)
+    return type(color) == "string" and color:match("^#%x%x%x%x%x%x$") ~= nil
+  end
+  local normal_bg = hl.Normal.bg
+  local normal_idx = to_256(normal_bg)
+  local function cterm(color)
+    return is_hex(color) and to_256(color) or "NONE"
+  end
+  -- A background meant to differ from Normal's (cursor line, menus, diff) must not round to
+  -- the same index, or it disappears. Near-white tanuki-day backgrounds would.
+  local function cterm_bg(color, avoid)
+    if not is_hex(color) then
+      return "NONE"
+    end
+    avoid = vim.deepcopy(avoid or {})
+    if color:lower() ~= normal_bg:lower() then
+      avoid[normal_idx] = true
+    end
+    return to_256(color, avoid)
+  end
+
+  -- The diff backgrounds must stay distinguishable from each other too. DiffChange goes
+  -- first so DiffAdd, picked next, keeps a green index.
+  local diff_bg, used = {}, {}
+  for _, group in ipairs({ "DiffChange", "DiffAdd", "DiffDelete", "DiffText" }) do
+    local spec = hl[group]
+    if type(spec) == "table" and is_hex(spec.bg) then
+      diff_bg[group] = cterm_bg(spec.bg, used)
+      used[diff_bg[group]] = true
+    end
+  end
 
   local names = {}
   for name in pairs(hl) do
@@ -46,7 +80,12 @@ for _, style in ipairs({ "night", "day" }) do
     "hi clear",
     "if exists('syntax_on') | syntax reset | endif",
     ("let g:colors_name = '%s'"):format(name),
-    "set termguicolors",
+    "",
+    '" 24-bit colors when the terminal says it supports them; otherwise the cterm',
+    '" values below (nearest xterm-256 colors) are used. Never turned off here.',
+    "if has('termguicolors') && !&termguicolors && ($COLORTERM ==# 'truecolor' || $COLORTERM ==# '24bit')",
+    "  set termguicolors",
+    "endif",
     "",
   }
   local links = {}
@@ -55,12 +94,14 @@ for _, style in ipairs({ "night", "day" }) do
     if type(spec) == "string" or spec.link then
       links[#links + 1] = ("hi! link %s %s"):format(name, type(spec) == "string" and spec or spec.link)
     elseif next(spec) ~= nil then
-      out[#out + 1] = ("hi %s guifg=%s guibg=%s guisp=%s gui=%s cterm=%s"):format(
+      out[#out + 1] = ("hi %s guifg=%s guibg=%s guisp=%s gui=%s ctermfg=%s ctermbg=%s cterm=%s"):format(
         name,
         spec.fg or "NONE",
         spec.bg or "NONE",
         spec.sp or "NONE",
         attrs(spec),
+        cterm(spec.fg),
+        diff_bg[name] or cterm_bg(spec.bg),
         attrs(spec)
       )
     end

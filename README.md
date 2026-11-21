@@ -51,7 +51,8 @@ token by token against GitLab screenshots.
 ## ⚡️ Requirements
 
 - Neovim **0.9+** (or Vim 8+)
-- A terminal with truecolor support (`termguicolors`)
+- A terminal with truecolor support (`termguicolors`). In Vim, terminals without it get the
+  nearest 256 colors instead
 - Treesitter parsers for your languages, e.g. `:TSInstall c cpp rust go python bash`.
   Without a parser, a language falls back to Vim's simpler regex highlighting, and
   tanuki-day's language rules can't apply.

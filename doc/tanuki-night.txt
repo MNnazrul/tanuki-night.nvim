@@ -24,7 +24,9 @@ Rust, Zig, Python, Lua, Go, JS/TS, Vue, Ruby, Bash, CSS/SCSS, YAML, TOML,
 JSON, Make, HTML, Markdown).
 
 Requirements: Neovim >= 0.9 with 'termguicolors' (truecolor terminal).
-Vim 8+ works through the generated colors/tanuki-night.vim.
+Vim 8+ works through the generated colors/tanuki-night.vim. It turns on
+'termguicolors' when $COLORTERM is "truecolor" or "24bit" (and never turns it
+off); otherwise it uses the nearest xterm-256 colors.
 
 ==============================================================================
 2. USAGE                                                  *tanuki-night-usage*

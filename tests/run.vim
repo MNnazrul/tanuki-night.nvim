@@ -13,12 +13,35 @@ function! s:check(name, cond) abort
   endif
 endfunction
 
+" gui colors (#rrggbb) and cterm colors (xterm-256 index) of a group
 function! s:bg(group) abort
-  return synIDattr(synIDtrans(hlID(a:group)), 'bg#')
+  return synIDattr(synIDtrans(hlID(a:group)), 'bg#', 'gui')
 endfunction
 
 function! s:fg(group) abort
-  return synIDattr(synIDtrans(hlID(a:group)), 'fg#')
+  return synIDattr(synIDtrans(hlID(a:group)), 'fg#', 'gui')
+endfunction
+
+function! s:ctermbg(group) abort
+  return synIDattr(synIDtrans(hlID(a:group)), 'bg', 'cterm')
+endfunction
+
+function! s:ctermfg(group) abort
+  return synIDattr(synIDtrans(hlID(a:group)), 'fg', 'cterm')
+endfunction
+
+" the diff backgrounds have 4 different xterm-256 colors (16+; 0-15 are Vim's
+" defaults or the terminal's palette), none of them Normal's
+function! s:diff_distinct() abort
+  let l:seen = {s:ctermbg('Normal'): 1}
+  for l:group in ['DiffAdd', 'DiffChange', 'DiffDelete', 'DiffText']
+    let l:bg = s:ctermbg(l:group)
+    if l:bg ==# '' || str2nr(l:bg) < 16 || has_key(l:seen, l:bg)
+      return 0
+    endif
+    let l:seen[l:bg] = 1
+  endfor
+  return 1
 endfunction
 
 function! s:is(name, background, normal_bg) abort
@@ -29,13 +52,25 @@ endfunction
 let s:night = '#1d1f21'
 let s:day = '#ffffff'
 
+" 'termguicolors' is turned on only when $COLORTERM says the terminal has truecolor
+set notermguicolors
+let $COLORTERM = ''
+
 colorscheme tanuki-night
 call s:check('night loads', s:is('tanuki-night', 'dark', s:night))
 call s:check('night Function blue', s:fg('Function') ==# '#81a2be')
+call s:check('no truecolor: termguicolors stays off', !&termguicolors)
+call s:check('night 256 colors', s:ctermbg('Normal') ==# '234' && s:ctermfg('Normal') ==# '251'
+      \ && s:ctermfg('Function') ==# '110')
+call s:check('night diff backgrounds distinct in 256 colors', s:diff_distinct())
 
 colorscheme tanuki-day
 call s:check('day loads', s:is('tanuki-day', 'light', s:day))
 call s:check('day Function #990000', s:fg('Function') ==# '#990000')
+call s:check('day 256 colors', s:ctermbg('Normal') ==# '231' && s:ctermfg('Normal') ==# '237'
+      \ && s:ctermfg('Function') ==# '88')
+call s:check('day diff backgrounds distinct in 256 colors', s:diff_distinct())
+call s:check('day CursorLine visible in 256 colors', s:ctermbg('CursorLine') !=# s:ctermbg('Normal'))
 
 colorscheme tanuki-night
 call s:check('day -> night', s:is('tanuki-night', 'dark', s:night))
@@ -52,6 +87,13 @@ unlet! g:colors_name
 set background=light
 colorscheme tanuki-night
 call s:check('bg=light then :colo tanuki-night', s:is('tanuki-night', 'dark', s:night))
+
+let $COLORTERM = 'truecolor'
+colorscheme tanuki-night
+call s:check('truecolor terminal: termguicolors turned on', &termguicolors)
+let $COLORTERM = ''
+colorscheme tanuki-day
+call s:check('termguicolors set by the user stays on', &termguicolors)
 
 " Any error message while loading counts as a failure, and is printed.
 call s:check('no error messages', v:errmsg ==# '')

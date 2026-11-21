@@ -33,3 +33,14 @@ jobs:
         run: |
           make gen
           git diff --exit-code -- colors extras
+
+  vim:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: rhysd/action-setup-vim@v1
+        id: vim
+        with:
+          version: stable
+      - name: Tests
+        run: make test-vim VIM=${{ steps.vim.outputs.executable }}

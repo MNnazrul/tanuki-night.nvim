@@ -51,5 +51,12 @@ set background=light
 colorscheme tanuki-night
 call s:check('bg=light then :colo tanuki-night', s:is('tanuki-night', 'dark', s:night))
 
+" Any error message while loading counts as a failure, and is printed.
+call s:check('no error messages', v:errmsg ==# '')
+if v:errmsg !=# ''
+  call writefile(['     ' . v:errmsg] + split(execute('messages'), "\n"), '/dev/stdout', 'a')
+endif
+
 call writefile(['', s:failures . ' failure(s)'], '/dev/stdout', 'a')
-execute s:failures > 0 ? 'cquit' : 'qall!'
+" -es exits with 1 after any error message, so set the exit code explicitly.
+execute 'cquit ' . (s:failures > 0 ? 1 : 0)

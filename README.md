@@ -296,6 +296,38 @@ and lists the captures that disagree.
 python3 scripts/compare_light.py <shots-dir> day <parser-dir> <download-cache>
 ```
 
+<details>
+<summary>tanuki-day agreement with GitLab Light, per language</summary>
+
+Tokens whose color matches GitLab in the screenshots. Languages at 100% need no special
+rules: the generic colors already match. Vue's lower score is explained under
+[Limitations](#%EF%B8%8F-limitations).
+
+| Language | Tokens | Match |
+|---|---|---|
+| C | 715 / 724 | 98.8% |
+| C++ | 273 / 283 | 96.5% |
+| Go | 242 / 244 | 99.2% |
+| HTML | 75 / 75 | 100.0% |
+| JavaScript | 234 / 236 | 99.2% |
+| JSON | 55 / 55 | 100.0% |
+| Lua | 279 / 280 | 99.6% |
+| Makefile | 219 / 235 | 93.2% |
+| Markdown | 225 / 225 | 100.0% |
+| Python | 430 / 466 | 92.3% |
+| Ruby | 226 / 230 | 98.3% |
+| Rust | 341 / 359 | 95.0% |
+| SCSS | 49 / 50 | 98.0% |
+| Shell | 270 / 284 | 95.1% |
+| TOML | 65 / 65 | 100.0% |
+| TypeScript | 222 / 224 | 99.1% |
+| Vue | 145 / 181 | 80.1% |
+| YAML | 91 / 91 | 100.0% |
+| Zig | 482 / 487 | 99.0% |
+| **All** | **4,638 / 4,794** | **96.7%** |
+
+</details>
+
 ## 🤝 Contributing
 
 Issues and pull requests are welcome!

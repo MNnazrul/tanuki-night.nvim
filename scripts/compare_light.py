@@ -4,13 +4,19 @@
 usage: compare_light.py SHOTS_DIR STYLE PARSER_RTP CACHE_DIR [shot-prefix ...]
 Reads SHOTS_DIR/MANIFEST.md (filename | URL | lines), downloads each file (raw),
 renders the same lines with scripts/tokens.lua, classifies each token's color in
-the screenshot with scripts/tok.py, and prints the disagreements grouped by capture.
+the screenshot with scripts/tok.py, and prints the agreement per language and the
+disagreements grouped by capture.
+
+Screenshots of GitLab UI states (blame view, selected text, highlighted #L lines) change the
+background, so they're reported separately and left out of the syntax agreement.
 """
 import collections, json, os, re, subprocess, sys, urllib.request
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(__file__))
 import tok  # noqa: E402
+
+UI_SHOTS = {"blame", "line-highlight", "selection"}
 
 ROLE = {  # tanuki-day fg -> role
     "#3a383d": "fg", "#555555": "fg", "#999988": "grey", "#999999": "grey", "#dd1144": "string",
@@ -76,6 +82,7 @@ def main():
     only = sys.argv[5:]
     agg = collections.defaultdict(lambda: [0, []])
     total = agree = 0
+    per_lang = collections.defaultdict(lambda: [0, 0])  # lang -> [agree, total]
     for fname, url, first, last in manifest(shots_dir):
         if only and not any(fname.startswith(p) for p in only):
             continue
@@ -104,14 +111,23 @@ def main():
             if seen is None:
                 continue
             total += 1
+            per_lang[lang][1] += 1
             if seen == want:
                 agree += 1
+                per_lang[lang][0] += 1
             else:
                 key = (lang, r["name"], want, seen)
                 agg[key][0] += 1
                 if len(agg[key][1]) < 4:
                     agg[key][1].append(f'{r["text"]}@{r["line"]}')
-    print(f"agreement: {agree}/{total} = {100 * agree / max(1, total):.1f}%\n")
+    syn = [v for k, v in per_lang.items() if k not in UI_SHOTS]
+    syn_agree, syn_total = sum(a for a, _ in syn), sum(t for _, t in syn)
+    print(f"syntax agreement: {syn_agree}/{syn_total} = {100 * syn_agree / max(1, syn_total):.1f}%")
+    print(f"all screenshots:  {agree}/{total} = {100 * agree / max(1, total):.1f}%\n")
+    for lang, (a, t) in sorted(per_lang.items(), key=lambda kv: (kv[0] in UI_SHOTS, kv[0])):
+        note = "  (UI state)" if lang in UI_SHOTS else ""
+        print(f"  {lang:15s} {a:5d}/{t:<5d} {100 * a / max(1, t):5.1f}%{note}")
+    print()
     for (lang, name, want, seen), (n, ex) in sorted(agg.items(), key=lambda kv: (kv[0][0], -kv[1][0])):
         if n >= 2:
             print(f"{lang:11s} {name:32s} ours={want:8s} gitlab={seen:8s} x{n:<3d} {' '.join(ex)}")

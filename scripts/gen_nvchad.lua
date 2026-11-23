@@ -34,16 +34,36 @@ local EXTRA = {
   },
 }
 
+-- Default link a syntax file gives a legacy group (rustFuncCall -> Function).
+local sourced = {}
+local function default_link(group)
+  local ft = group:match("^(%l+)%u")
+  if ft and not sourced[ft] then
+    sourced[ft] = true
+    vim.cmd.runtime("syntax/" .. ft .. ".vim")
+  end
+  return vim.api.nvim_get_hl(0, { name = group, link = true }).link
+end
+
 for _, style in ipairs({ "night", "day" }) do
   local name = "tanuki-" .. style
   local x = EXTRA[style]
   local hl, c = require("tanuki-night").highlights(style)
-  if style == "night" then
-    -- day-only captures: clear them, so switching day -> night in NvChad leaves nothing behind
-    for k in pairs(require("tanuki-night").highlights("day")) do
-      if k:find("^@tanuki") then
-        hl[k] = {}
-      end
+
+  -- base46's <leader>tt sets the new theme's groups over the old ones without
+  -- `hi clear`, so a group only the other style sets would keep its color after
+  -- the toggle. Set it here to what this style shows without it: the nearest
+  -- @capture parent (@function.call.c -> @function.call), or the syntax file's
+  -- default link (rustFuncCall -> Function). Nothing to fall back to: clear it.
+  local filled, cleared = {}, {}
+  for k in pairs(require("tanuki-night").highlights(style == "night" and "day" or "night")) do
+    if hl[k] == nil then
+      local parent = k
+      repeat
+        parent = parent:match("^(@.+)%.[^.]+$") or default_link(parent)
+      until not parent or hl[parent] ~= nil
+      hl[k] = parent or {}
+      filled[k], cleared[k] = true, parent == nil
     end
   end
 
@@ -132,7 +152,7 @@ for _, style in ipairs({ "night", "day" }) do
           fields[#fields + 1] = f .. " = true"
         end
       end
-      if #fields == 0 and (k:find("^@lsp") or k:find("^@tanuki")) then
+      if #fields == 0 and (k:find("^@lsp") or k:find("^@tanuki") or cleared[k]) then
         fields[1] = 'link = "@none"' -- base46 merges tables, so an empty spec can't clear
       end
       out[#out + 1] = ("%s[%q] = { %s },"):format(indent, k, table.concat(fields, ", "))
@@ -154,6 +174,12 @@ for _, style in ipairs({ "night", "day" }) do
   end
   -- legacy per-language groups (rustAttribute, ...) from groups/languages.lua
   for k in pairs(require("tanuki-night.groups.languages" .. (style == "day" and "_day" or ""))(c)) do
+    if not k:find("^@") then
+      syntax[k] = hl[k]
+    end
+  end
+  -- ...and the other style's legacy groups filled in above
+  for k in pairs(filled) do
     if not k:find("^@") then
       syntax[k] = hl[k]
     end

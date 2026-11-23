@@ -99,6 +99,43 @@ check("lualine day theme", pcall(require, "lualine.themes.tanuki-day"))
 check("nvchad theme parses", loadfile("extras/nvchad/tanuki-night.lua") ~= nil)
 check("nvchad day theme parses", loadfile("extras/nvchad/tanuki-day.lua") ~= nil)
 
+-- base46's <leader>tt applies the new theme's groups over the old ones without
+-- `hi clear`, so a group only one theme sets keeps that theme's color after the
+-- toggle (day's #3a383d @function.call.c made scanf() near-invisible in night).
+do
+  package.loaded.base46 = {
+    override_theme = function(m)
+      return m
+    end,
+  }
+  local function polish(style)
+    local all = {}
+    for _, section in pairs(dofile("extras/nvchad/tanuki-" .. style .. ".lua").polish_hl) do
+      for k, v in pairs(section) do
+        all[k] = v
+      end
+    end
+    return all
+  end
+  local themes = { night = polish("night"), day = polish("day") }
+  for _, pair in ipairs({ { "day", "night" }, { "night", "day" } }) do
+    local stale = {}
+    for k in pairs(themes[pair[1]]) do
+      if not themes[pair[2]][k] then
+        stale[#stale + 1] = k
+      end
+    end
+    table.sort(stale)
+    check(("nvchad %s -> %s leaves no stale groups"):format(pair[1], pair[2]), #stale == 0, table.concat(stale, ", "))
+  end
+  local call_c, call = themes.night["@function.call.c"], themes.night["@function.call"]
+  check(
+    "nvchad night @function.call.c falls back to @function.call",
+    call_c and call_c.fg == call.fg and call_c.bold == call.bold
+  )
+  package.loaded.base46 = nil
+end
+
 -- nearest xterm-256 colors (used for cterm colors in colors/*.vim)
 do
   local to_256 = require("tanuki-night.util").to_256
